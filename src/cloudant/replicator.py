@@ -136,7 +136,7 @@ class Replicator(object):
         """
         try:
             repl_doc = self.database[repl_id]
-        except KeyError:
+        except CloudantException:
             raise CloudantException(
                 "Replication {} not found".format(repl_id)
             )
@@ -168,7 +168,7 @@ class Replicator(object):
                 arepl_doc = self.database[repl_id]
                 arepl_doc.fetch()
                 return arepl_doc, arepl_doc.get('_replication_state')
-            except KeyError:
+            except CloudantException:
                 return None, None
 
         while True:
@@ -203,7 +203,7 @@ class Replicator(object):
 
         try:
             repl_doc = self.database[repl_id]
-        except KeyError:
+        except CloudantException:
             raise CloudantException(
                 "Could not find replication with id {}".format(repl_id))
 

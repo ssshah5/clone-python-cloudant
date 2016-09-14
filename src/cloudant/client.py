@@ -280,8 +280,8 @@ class CouchDB(dict):
         If the database instance already exists locally then it is returned and
         a remote request is not performed.
 
-        A KeyError will result if the database does not exist locally or on the
-        server.
+        A CloudantException will result if the database does not exist locally
+        or on the server.
 
         :param str key: Database name used to retrieve the database object.
 
@@ -294,7 +294,8 @@ class CouchDB(dict):
             super(CouchDB, self).__setitem__(key, db)
             return db
         else:
-            raise KeyError(key)
+            raise CloudantException('Database {0} does not exist locally or on'
+                                    ' the server'.format(key))
 
     def __delitem__(self, key, remote=False):
         """

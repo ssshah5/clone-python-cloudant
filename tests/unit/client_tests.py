@@ -235,8 +235,8 @@ class ClientTests(UnitTestDbBase):
         try:
             self.client.connect()
             db = self.client['no_such_db']
-            self.fail('Above statement should raise a KeyError')
-        except KeyError:
+            self.fail('Above statement should raise a CloudantException')
+        except CloudantException:
             pass
         finally:
             self.client.disconnect()
@@ -291,8 +291,8 @@ class ClientTests(UnitTestDbBase):
             # Database removed remotely as well
             try:
                 db = self.client[dbname]
-                self.fail('Above statement should raise a KeyError')
-            except KeyError:
+                self.fail('Above statement should raise a CloudantException')
+            except CloudantException:
                 pass
         finally:
             self.client.disconnect()

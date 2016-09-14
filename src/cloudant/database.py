@@ -558,8 +558,8 @@ class CouchDatabase(dict):
         If the document instance already exists locally then it is returned and
         a remote request is not performed.
 
-        A KeyError will result if the document does not exist locally or in the
-        remote database.
+        A CloudantException will result if the document does not exist locally
+        or in the remote database.
 
         :param str key: Document id used to retrieve the document from the
             database.
@@ -578,7 +578,8 @@ class CouchDatabase(dict):
             super(CouchDatabase, self).__setitem__(key, doc)
             return doc
         else:
-            raise KeyError(key)
+            raise CloudantException('Document {0} does not exist locally or on'
+                                    ' the server'.format(key))
 
     def __iter__(self, remote=True):
         """

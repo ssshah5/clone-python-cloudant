@@ -371,8 +371,8 @@ class DatabaseTests(UnitTestDbBase):
         """
         try:
             doc = self.db['no_such_doc']
-            self.fail('Above statement should raise a KeyError')
-        except KeyError:
+            self.fail('Above statement should raise a CloudantException')
+        except CloudantException:
             pass
 
     def test_get_db_via_getitem(self):
