@@ -59,13 +59,19 @@ class ReplicatorTests(UnitTestDbBase):
         """
         Reset test attributes
         """
-        self.target_db.delete()
+        if self.client.admin_party:
+            self.target_db.delete()
+        else:
+            self.client.r_session.delete(self.target_db.database_url)
         del self.test_target_dbname
-        del self.target_db
         while self.replication_ids:
             self.replicator.stop_replication(self.replication_ids.pop())
         del self.replicator
-        self.db_tear_down()
+        if self.client.admin_party:
+            self.db_tear_down()
+        else:
+            self.client.r_session.delete(self.target_db.database_url)
+        del self.target_db
         super(ReplicatorTests, self).tearDown()
 
     def test_constructor(self):

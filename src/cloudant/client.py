@@ -73,7 +73,6 @@ class CouchDB(dict):
         if self._client_user_header is not None:
             self.r_session.headers.update(self._client_user_header)
         if not self.admin_party:
-            self.r_session.auth = (self._user, self._auth_token)
             self.session_login(self._user, self._auth_token)
         self._client_session = self.session()
         # Utilize an event hook to append to the response message

@@ -54,7 +54,6 @@ class ClientTests(UnitTestDbBase):
             with couchdb(self.user, self.pwd, url=self.url) as c:
                 self.assertIsInstance(c, CouchDB)
                 self.assertIsInstance(c.r_session, requests.Session)
-                self.assertEqual(c.r_session.auth, (self.user, self.pwd))
         except Exception as err:
             self.fail('Exception {0} was raised.'.format(str(err)))
 
@@ -95,10 +94,6 @@ class ClientTests(UnitTestDbBase):
             self.assertIsInstance(self.client.r_session, requests.Session)
             if self.client.admin_party:
                 self.assertIsNone(self.client.r_session.auth)
-            else:
-                self.assertEqual(
-                    self.client.r_session.auth, (self.user, self.pwd)
-                )
         finally:
             self.client.disconnect()
             self.assertIsNone(self.client.r_session)
@@ -391,6 +386,33 @@ class ClientTests(UnitTestDbBase):
             self.assertEqual(db_updates._options.get('limit'), 100)
         finally:
             self.client.disconnect()
+
+    @unittest.skipUnless(
+        (os.environ.get('RUN_CLOUDANT_TESTS') and
+        os.environ.get('ADMIN_PARTY') is None),
+        'Skipping test when CouchDB admin party is set to true'
+    )
+    def test_database_request_fails_after_client_disconnects(self):
+        """
+        Test that after disconnecting from a client any objects created based
+        on that client are not able to make requests.
+        """
+        dbname = self.dbname()
+        try:
+            self.client.connect()
+            db = self.client.create_database(dbname)
+            self.assertIsNotNone(db.doc_count())
+            self.client.disconnect()
+            db.doc_count()
+        except requests.HTTPError as err:
+            self.assertEqual(
+                err.response.status_code,
+                401
+            )
+            self.assertIsNone(self.client.r_session)
+        finally:
+            self.client.connect()
+            self.client.delete_database(dbname)
 
 @unittest.skipUnless(
     os.environ.get('RUN_CLOUDANT_TESTS') is not None,
